@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(set -e)",
+      "Bash(cat)",
+      "Bash(git -c user.name=yash-srivastava19 -c user.email=ysrivastava82@gmail.com commit -q -m ' *)"
+    ]
+  }
+}
