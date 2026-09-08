@@ -1,12 +1,18 @@
-# Anything listed here is NOT applied to $HOME on this machine.
-# This file is itself a template, so it can branch on OS/hostname.
+# Files listed here are NOT applied to $HOME on this machine.
+# This file is itself a template, so it can branch on OS and distro.
 
-{{ if ne .chezmoi.os "linux" }}
-# Wayland/Hyprland/Omarchy layer — Linux only.
+{{ if eq .chezmoi.os "linux" -}}
+{{   if ne .chezmoi.osRelease.id "omarchy" -}}
+# Linux, but not Omarchy: the Hyprland config assumes Omarchy's own lua
+# modules ($OMARCHY_PATH/default/hypr/bootstrap.lua) and is useless without
+# them, so it is skipped entirely rather than half-applied.
 .config/hypr
 .config/omarchy
-{{ end }}
-
-{{ if ne .chezmoi.os "darwin" }}
-# macOS-only files would go here.
-{{ end }}
+{{   end -}}
+{{ else -}}
+# Not Linux at all — no Wayland, no Hyprland, no Omarchy.
+# Checked in the else branch on purpose: .chezmoi.osRelease does not exist on
+# macOS, so referencing it outside a linux guard would error.
+.config/hypr
+.config/omarchy
+{{ end -}}
