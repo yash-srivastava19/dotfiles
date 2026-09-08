@@ -4,7 +4,7 @@
 # include install-time system state (base, efibootmgr, btrfs-progs, cups-*,
 # intel-ucode, retroarch and the libretro cores) that must never be replayed
 # onto another machine. This list is hand-curated and dev-tooling only; GUI
-# apps (1password, obsidian, tailscale, localsend) are installed by hand.
+# apps (obsidian, tailscale, localsend) are installed by hand.
 
 # shell
 zsh

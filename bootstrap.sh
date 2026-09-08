@@ -96,5 +96,5 @@ if [[ "$(basename "${SHELL:-}")" != zsh ]] && command -v zsh >/dev/null; then
 fi
 
 log "Done. Open a new shell."
-log "Not handled here (deliberately): 'gh auth login', 1Password sign-in,"
-log "and anything else that needs a credential."
+log "Not handled here (deliberately): 'gh auth login' and anything else"
+log "that needs a credential."

@@ -1,95 +1,74 @@
 # dotfiles
 
-My development environment: dotfiles, keybindings, toolchain pins, and the
-package list needed to reproduce them. Managed with
-[chezmoi](https://chezmoi.io).
+My development environment — dotfiles, keybindings, toolchain pins and package
+lists — managed with [chezmoi](https://chezmoi.io). Works on Arch/Omarchy and
+macOS from the same source.
 
 ## New machine
 
 ```sh
-git clone <this-repo> ~/dotfiles
+git clone https://github.com/yash-srivastava19/dotfiles ~/dotfiles
 ~/dotfiles/bootstrap.sh
 ```
 
-Then open a new shell. Credentials are deliberately not automated — run
-`gh auth login` and sign in to 1Password yourself.
+Installs packages, applies dotfiles, installs the pinned runtimes. Then open a
+new shell and run `gh auth login`.
 
 ## Day-to-day
 
 ```sh
 chezmoi diff              # what would change in $HOME
-chezmoi apply             # apply repo -> $HOME
-chezmoi add ~/.config/foo # start tracking a new file
+chezmoi apply             # repo -> $HOME
+chezmoi add ~/.config/foo # start tracking a file
 chezmoi re-add            # pull local edits back into the repo
-chezmoi edit ~/.zshrc     # edit the source of a managed file
 chezmoi update            # git pull, then apply
 ```
 
-After `chezmoi add`/`re-add`, commit and push from this repo as normal.
-
-These bare commands work because `bootstrap.sh` records `sourceDir` in
-`~/.config/chezmoi/chezmoi.toml`. `chezmoi init --source=...` does *not*
-persist it, so without that step every command would need `--source=` and
-`chezmoi add` would write to the wrong place.
-
-## Why chezmoi and not stow / nix
-
-- **chezmoi writes real files, not symlinks.** Omarchy rewrites
-  `~/.config/hypr/*` and `~/.bashrc` on upgrade. Under home-manager those are
-  read-only symlinks into the nix store and the upgrade fails; here the
-  upgrade just succeeds and `chezmoi diff` shows what changed, so it can be
-  accepted (`re-add`) or reverted (`apply`).
-- **Templating handles the Arch/macOS split.** `dot_zshrc.tmpl` renders a
-  correct `.zshrc` on both; `.chezmoiignore` drops `hypr/` and `omarchy/`
-  entirely on macOS. Symlink farms like stow have no answer for this.
-- **Nix would give byte-identical binaries**, which chezmoi does not. The
-  substitute is pinning: exact versions in `mise/config.toml`, exact commits
-  in `nvim/lazy-lock.json`. That is most of the practical benefit without
-  making nix a fourth thing on `PATH` after pacman, yay, and mise.
+Then commit and push from this repo as usual.
 
 ## Layout
 
 ```
-.chezmoiroot          -> "home", so only home/ is applied to $HOME
-home/                 chezmoi source directory
-  .chezmoiignore      per-OS exclusions (a template)
-  .chezmoiexternal.toml   Omarchy themes, cloned rather than vendored
-  dot_zshrc.tmpl      -> ~/.zshrc
-  dot_config/...      -> ~/.config/...
-packages/             curated install lists (arch, aur, brew, brew-cask)
-bootstrap.sh          fresh-machine entrypoint
+.chezmoiroot            "home" — only that subtree is applied to $HOME
+home/                   chezmoi source directory
+  .chezmoiignore        per-OS exclusions (itself a template)
+  .chezmoiexternal.toml Omarchy themes, cloned rather than vendored
+  dot_zshrc.tmpl        -> ~/.zshrc
+  dot_config/...        -> ~/.config/...
+packages/               curated install lists
+bootstrap.sh            fresh-machine entrypoint
 ```
 
-chezmoi's naming rules used here: `dot_` becomes a leading `.`,
-`.tmpl` marks a Go-template file, `executable_` sets the executable bit,
-`private_` sets 0600.
+chezmoi naming: `dot_` becomes a leading `.`, `.tmpl` marks a Go template,
+`executable_` sets the executable bit, `private_` sets 0600.
 
-## What is deliberately excluded
+## Why chezmoi
 
-- **Secrets.** `~/.config/gh` (OAuth token), `~/.claude.json`, `~/.kube`,
-  `~/.config/1Password`. The repo is built from an explicit allowlist, never
-  a copy-everything-minus-a-denylist.
-- **`pacman -Qqe` in full.** 252 explicit packages include `base`,
-  `efibootmgr`, `btrfs-progs`, `cups-*`, `intel-ucode`, `retroarch` and the
-  libretro cores — install-time system state, not devex. `packages/arch.txt`
-  is hand-curated.
-- **Omarchy theme repos.** Cloned by `.chezmoiexternal.toml` rather than
-  vendored. `event-horizon` (~406MB of video backgrounds) is commented out —
-  uncomment it there if you want it.
-- **`btop.conf`.** btop rewrites the whole file on exit, so tracking it means
-  endless diffs for two non-default settings.
-- **`kitty.conf`.** kitty is not installed; the config is an Omarchy leftover.
-- **GUI apps.** `packages/` is dev tooling only. 1Password, Obsidian,
-  Tailscale and LocalSend are installed by hand.
-- **`~/.config/hypr/hyprland.conf`.** Dead file. Omarchy quattro's entrypoint
-  is `hyprland.lua`; the `.conf` is the stock upstream sample and is not read.
+- **It writes real files, not symlinks.** Omarchy rewrites `~/.config/hypr/*`
+  on upgrade. Under home-manager those are read-only symlinks into the nix
+  store and the upgrade fails; here it succeeds and `chezmoi diff` shows what
+  changed, to accept (`re-add`) or revert (`apply`).
+- **Templates handle the Arch/macOS split.** `dot_zshrc.tmpl` renders correctly
+  on both; `.chezmoiignore` drops `hypr/` and `omarchy/` on macOS. stow has no
+  answer for this.
+- **Reproducibility comes from pinning**, not from nix: exact versions in
+  `mise/config.toml`, exact commits in `nvim/lazy-lock.json`. Most of the
+  benefit without a fourth thing on `PATH` after pacman, yay and mise.
 
-## Per-machine bits
+## Notes
 
-- `home/dot_config/hypr/monitors.lua.tmpl` branches on hostname. Add a block
-  for each new machine (`hyprctl monitors` lists the outputs).
-- `~/.zshrc.local` is sourced last if present and is never committed — the
-  place for a machine's own exports.
-- `hypr/autostart.lua` is empty but committed anyway: `hyprland.lua` does an
-  unconditional `require("hypr.autostart")`, so a missing file would abort the
-  whole config load on a fresh machine and leave Hyprland with no user config.
+- **No secrets.** Built from an explicit allowlist, so tokens and keys are
+  excluded by construction rather than by a denylist that eventually leaks.
+- **`packages/` is not `pacman -Qqe`.** That list is mostly install-time system
+  state (`base`, `efibootmgr`, `cups-*`, `intel-ucode`) which must not be
+  replayed onto another machine. This one is hand-curated dev tooling; GUI apps
+  are installed by hand.
+- **Per-machine bits.** `hypr/monitors.lua.tmpl` branches on hostname — add a
+  block per machine (`hyprctl monitors` lists outputs). `~/.zshrc.local` is
+  sourced last if present and never committed.
+- **`hypr/autostart.lua` is empty but committed.** `hyprland.lua` does an
+  unconditional `require("hypr.autostart")`, so a missing file aborts the whole
+  config load on a fresh machine.
+- **Not tracked:** `btop.conf` (btop rewrites it on every exit),
+  `kitty.conf` (kitty not installed). `event-horizon` is commented out in
+  `.chezmoiexternal.toml` — ~406MB of video backgrounds.
