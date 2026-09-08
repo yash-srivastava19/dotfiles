@@ -1,0 +1,25 @@
+# Language runtimes and CLI tools, pinned.
+#
+# Versions are exact on purpose: "latest" means two machines set up a month
+# apart get different tools, which defeats the point of this repo. To move
+# forward, run `mise outdated`, bump a line here, and commit that bump.
+
+[tools]
+node   = "25.0.0"
+python = ["3.14.7", "3.12.13"]
+ruby   = "4.0.6"
+
+gh       = "2.98.0"
+claude   = "2.1.252"
+codex    = "0.150.1"
+opencode = "1.18.25"
+pi       = "0.84.4"
+
+"aqua:modem-dev/hunk"    = "0.21.1"
+"npm:@xai-official/grok" = "1.0.13"
+
+[settings]
+idiomatic_version_file_enable_tools = ["ruby"]
+
+[settings.ruby]
+compile = false

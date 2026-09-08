@@ -1,0 +1,73 @@
+# Arch/Omarchy development packages. Installed by bootstrap.sh via yay.
+#
+# Deliberately NOT the full `pacman -Qqe` output — those 252 explicit packages
+# include install-time system state (base, efibootmgr, btrfs-progs, cups-*,
+# intel-ucode, retroarch and the libretro cores) that must never be replayed
+# onto another machine. This list is hand-curated and dev-tooling only; GUI
+# apps (1password, obsidian, tailscale, localsend) are installed by hand.
+
+# shell
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+bash-completion
+starship
+zoxide
+
+# core cli
+bat
+eza
+fd
+ripgrep
+fzf
+jq
+less
+unzip
+tldr
+dua-cli
+plocate
+gum
+expac
+imagemagick
+xmlstarlet
+qrencode
+socat
+inetutils
+whois
+wl-clipboard
+btop
+
+# git
+git
+github-cli
+lazygit
+
+# editors and terminals
+neovim
+tree-sitter-cli
+alacritty
+ghostty
+tmux
+zed
+emacs
+
+# containers
+docker
+docker-buildx
+docker-compose
+lazydocker
+
+# system toolchains (language runtimes come from mise, not here)
+clang
+llvm
+rust
+lua51
+luarocks
+mise-bin
+
+# fonts
+ttf-cascadia-mono-nerd
+ttf-jetbrains-mono-nerd-basic
+inter-font
+noto-fonts
+noto-fonts-emoji

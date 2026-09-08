@@ -1,0 +1,28 @@
+# macOS equivalents. Installed by bootstrap.sh via `brew install`.
+
+# formulae
+bat
+eza
+fd
+ripgrep
+fzf
+jq
+tealdeer
+dua-cli
+gum
+imagemagick
+yt-dlp
+git
+gh
+lazygit
+lazydocker
+neovim
+tree-sitter-cli
+tmux
+starship
+zoxide
+mise
+zsh-autosuggestions
+zsh-syntax-highlighting
+lua
+luarocks

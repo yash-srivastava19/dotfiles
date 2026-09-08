@@ -1,0 +1,8 @@
+# macOS GUI dev tools and fonts (brew install --cask).
+# Non-dev apps are installed by hand, matching packages/arch.txt.
+alacritty
+ghostty
+zed
+font-caskaydia-mono-nerd-font
+font-jetbrains-mono-nerd-font
+font-inter

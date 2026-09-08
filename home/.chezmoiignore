@@ -1,0 +1,12 @@
+# Anything listed here is NOT applied to $HOME on this machine.
+# This file is itself a template, so it can branch on OS/hostname.
+
+{{ if ne .chezmoi.os "linux" }}
+# Wayland/Hyprland/Omarchy layer — Linux only.
+.config/hypr
+.config/omarchy
+{{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+# macOS-only files would go here.
+{{ end }}

@@ -1,0 +1,44 @@
+[user]
+	name = yash-srivastava19
+	email = ysrivastava82@gmail.com
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+
+[init]
+	defaultBranch = master
+[pull]
+	rebase = true            # Rebase (instead of merge) on pull
+[push]
+	autoSetupRemote = true   # Automatically set upstream branch on push
+[diff]
+	algorithm = histogram    # Clearer diffs on moved/edited lines
+	colorMoved = plain       # Highlight moved blocks in diffs
+	mnemonicPrefix = true    # More intuitive refs in diff output
+[commit]
+	verbose = true           # Include diff in commit message template
+[column]
+	ui = auto                # Output in columns when possible
+[branch]
+	sort = -committerdate    # Most recent branches first
+[tag]
+	sort = -version:refname  # Sort version numbers as expected
+[rerere]
+	enabled = true
+	autoupdate = true        # Reapply stored conflict resolutions
+
+[core]
+	excludesfile = {{ .chezmoi.homeDir }}/.gitignore_global
+
+# `!`-prefixed helpers run through a shell, so gh is resolved via PATH rather
+# than baked in as an absolute path (which differs between pacman, homebrew
+# and mise installs).
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential

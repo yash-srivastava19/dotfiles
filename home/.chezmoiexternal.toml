@@ -1,0 +1,35 @@
+# Upstream Omarchy themes are cloned, not vendored — they are large
+# (event-horizon alone is ~400MB of video backgrounds) and independently
+# versioned. Delete an entry to stop tracking that theme.
+{{ if eq .chezmoi.os "linux" -}}
+
+[".config/omarchy/themes/arc-blueberry"]
+    type = "git-repo"
+    url = "https://github.com/vale-c/omarchy-arc-blueberry"
+    refreshPeriod = "168h"
+    [".config/omarchy/themes/arc-blueberry".clone]
+        args = ["--depth", "1"]
+
+[".config/omarchy/themes/rainynight"]
+    type = "git-repo"
+    url = "https://github.com/atif-1402/omarchy-rainynight-theme.git"
+    refreshPeriod = "168h"
+    [".config/omarchy/themes/rainynight".clone]
+        args = ["--depth", "1"]
+
+[".config/omarchy/themes/synthetica"]
+    type = "git-repo"
+    url = "https://github.com/stannorbvb-cmd/synthetica.git"
+    refreshPeriod = "168h"
+    [".config/omarchy/themes/synthetica".clone]
+        args = ["--depth", "1"]
+
+# event-horizon is ~406MB of video backgrounds. Uncomment if you want it.
+# [".config/omarchy/themes/event-horizon"]
+#     type = "git-repo"
+#     url = "https://github.com/oldjobobo/omarchy-event-horizon-theme"
+#     refreshPeriod = "168h"
+#     [".config/omarchy/themes/event-horizon".clone]
+#         args = ["--depth", "1"]
+
+{{- end }}

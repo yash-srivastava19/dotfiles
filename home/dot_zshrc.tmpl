@@ -1,0 +1,110 @@
+# Managed by chezmoi. Edit the source, not this file:
+#   chezmoi edit ~/.zshrc && chezmoi apply
+# Machine-local, uncommitted overrides go in ~/.zshrc.local (sourced last).
+
+# Interactive shells only.
+[[ $- != *i* ]] && return
+
+# ---------------------------------------------------------------- path & env
+export PATH="$HOME/.local/bin:$PATH"
+export EDITOR="${EDITOR:-nvim}"
+export SUDO_EDITOR="$EDITOR"
+export BAT_THEME=ansi
+
+# ------------------------------------------------------------------- history
+HISTFILE=~/.zsh_history
+HISTSIZE=32768
+SAVEHIST=$HISTSIZE
+setopt HIST_IGNORE_DUPS
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+
+# --------------------------------------------------------------- completions
+autoload -Uz compinit && compinit
+
+{{ if eq .chezmoi.os "linux" -}}
+# ------------------------------------------------------- Omarchy (Arch only)
+# Omarchy ships its own aliases and shell functions; load them if present so
+# this file stays harmless on a machine without Omarchy.
+export OMARCHY_PATH="${OMARCHY_PATH:-$HOME/.local/share/omarchy}"
+if [[ -d $OMARCHY_PATH ]]; then
+  export PATH="$OMARCHY_PATH/bin:$PATH"
+  [[ -f $OMARCHY_PATH/default/bash/aliases ]] && source "$OMARCHY_PATH/default/bash/aliases"
+  for f in "$OMARCHY_PATH"/default/bash/fns/*(N); do source "$f"; done
+fi
+
+export YDOTOOL_SOCKET="$HOME/.ydotool_socket"
+{{- end }}
+
+{{ if eq .chezmoi.os "darwin" -}}
+# ------------------------------------------------------------ macOS homebrew
+for p in /opt/homebrew /usr/local; do
+  if [[ -x $p/bin/brew ]]; then eval "$($p/bin/brew shellenv)"; break; fi
+done
+{{- end }}
+
+# --------------------------------------------------------------------- tools
+# Every hook below is guarded, so a missing tool degrades silently instead of
+# printing an error on every new shell.
+
+command -v mise     >/dev/null && eval "$(mise activate zsh)"
+command -v zoxide   >/dev/null && eval "$(zoxide init zsh)"
+[[ ${TERM:-} != dumb ]] && command -v starship >/dev/null && eval "$(starship init zsh)"
+
+# fzf: `fzf --zsh` is the portable modern entrypoint; fall back to Arch's
+# packaged scripts on older versions.
+if command -v fzf >/dev/null; then
+  if fzf --zsh >/dev/null 2>&1; then
+    source <(fzf --zsh)
+  else
+    [[ -f /usr/share/fzf/completion.zsh   ]] && source /usr/share/fzf/completion.zsh
+    [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+  fi
+fi
+
+# zsh plugins live in different prefixes per platform.
+for _zsh_prefix in \
+  /usr/share/zsh/plugins \
+  "${HOMEBREW_PREFIX:-/opt/homebrew}/share" \
+  /usr/local/share
+do
+  [[ -f $_zsh_prefix/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+    source "$_zsh_prefix/zsh-autosuggestions/zsh-autosuggestions.zsh" && break
+done
+unset _zsh_prefix
+
+# ------------------------------------------------------------ bun (optional)
+export BUN_INSTALL="$HOME/.bun"
+[[ -d $BUN_INSTALL/bin ]] && export PATH="$BUN_INSTALL/bin:$PATH"
+[[ -s $BUN_INSTALL/_bun ]] && source "$BUN_INSTALL/_bun"
+
+# jmux needs this in the *initial* environment: the tmux server it spawns via
+# Bun.spawn ignores later process.env mutations, and without JMUX_DIR its
+# tmux.conf expands "$JMUX_DIR/config/defaults.conf" to "/config/..." and
+# silently loads nothing.
+export JMUX_DIR="$HOME/.bun/install/global/node_modules/@jx0/jmux"
+
+[[ -f $HOME/.openclaw/completions/openclaw.zsh ]] && source "$HOME/.openclaw/completions/openclaw.zsh"
+
+# ---------------------------------------------------- aliases and functions
+alias gco="git checkout"
+alias gpr="git pull --rebase"
+
+mkcd() { mkdir -p "$1" && cd "$1"; }
+
+# jmux: launch/attach an agent-orchestration session named after the cwd.
+j() { jmux "${1:-$(basename "$PWD")}"; }
+
+# ------------------------------------------------------------ machine-local
+[[ -f $HOME/.zshrc.local ]] && source "$HOME/.zshrc.local"
+
+# Syntax highlighting must be sourced last.
+for _zsh_prefix in \
+  /usr/share/zsh/plugins \
+  "${HOMEBREW_PREFIX:-/opt/homebrew}/share" \
+  /usr/local/share
+do
+  [[ -f $_zsh_prefix/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+    source "$_zsh_prefix/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" && break
+done
+unset _zsh_prefix

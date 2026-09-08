@@ -1,0 +1,3 @@
+# AUR-only packages (pacman cannot restore these without an AUR helper).
+# bootstrap.sh installs these with yay alongside packages/arch.txt.
+maplemononormal-nf

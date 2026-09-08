@@ -1,0 +1,11 @@
+-- Monitor layout is machine-specific. Add a branch per hostname.
+-- Discover outputs with: hyprctl monitors
+
+{{ if eq .chezmoi.hostname "omarchy" -}}
+hl.env("GDK_SCALE", "1")
+hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@60", position = "0x0",    scale = 1 })
+hl.monitor({ output = "eDP-1",    mode = "1920x1080@60", position = "1920x0", scale = 1 })
+{{- end }}
+
+-- Fallback for any output not named above.
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
