@@ -90,8 +90,6 @@ chezmoi's naming rules used here: `dot_` becomes a leading `.`,
   for each new machine (`hyprctl monitors` lists the outputs).
 - `~/.zshrc.local` is sourced last if present and is never committed — the
   place for a machine's own exports.
-- `nvim/lua/plugins/pairy.lua` points at a local checkout and returns an empty
-  spec when that directory is absent, so nvim starts cleanly elsewhere.
 - `hypr/autostart.lua` is empty but committed anyway: `hyprland.lua` does an
   unconditional `require("hypr.autostart")`, so a missing file would abort the
   whole config load on a fresh machine and leave Hyprland with no user config.
